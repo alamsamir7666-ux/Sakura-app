@@ -11,6 +11,8 @@ import '../../core/providers/app_providers.dart';
 import '../../shared/widgets/product_card.dart';
 import '../../shared/widgets/skeletons.dart';
 import '../../shared/widgets/common_widgets.dart';
+import '../../shared/widgets/flash_sale_section.dart';
+import '../../core/models/more_models.dart';
 
 final homepageProductsProvider = FutureProvider<HomepageProducts>((ref) {
   return ref.watch(productServiceProvider).getHomepageProducts();
@@ -39,6 +41,8 @@ class HomeScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeroBanner(context),
+              const SizedBox(height: 8),
+              _buildFlashSale(context),
               const SizedBox(height: 8),
               _buildCategories(context, ref),
               const SizedBox(height: 8),
@@ -164,6 +168,19 @@ class HomeScreen extends ConsumerWidget {
         padEnds: false,
       ),
     );
+  }
+
+  Widget _buildFlashSale(BuildContext context) {
+    // Static sample flash sales — in production, fetch from API
+    final sampleSales = [
+      FlashSale(id: 1, productId: 5, salePrice: 19.99, quantity: 50, sold: 32,
+          startTime: DateTime.now().subtract(const Duration(hours: 2)),
+          endTime: DateTime.now().add(const Duration(hours: 10)), isActive: true),
+      FlashSale(id: 2, productId: 8, salePrice: 24.99, quantity: 30, sold: 8,
+          startTime: DateTime.now().subtract(const Duration(hours: 1)),
+          endTime: DateTime.now().add(const Duration(hours: 8)), isActive: true),
+    ];
+    return FlashSaleSection(sales: sampleSales);
   }
 
   Widget _buildCategories(BuildContext context, WidgetRef ref) {
