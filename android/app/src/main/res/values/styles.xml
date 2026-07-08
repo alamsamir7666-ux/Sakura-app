@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="android:windowBackground">@color/sakuraWhite</item>
+        <item name="android:statusBarColor">@color/sakuraWhite</item>
+        <item name="android:navigationBarColor">@color/sakuraWhite</item>
+    </style>
+    <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="android:windowBackground">@color/sakuraWhite</item>
+    </style>
+    <color name="sakuraWhite">#FFFFF5F5</color>
+</resources>

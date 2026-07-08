@@ -1,0 +1,39 @@
+# Flutter
+build/
+.dart_tool/
+.packages
+.pub/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.idea/
+.vscode/
+*.lock
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# Android
+android/local.properties
+android/.gradle
+android/app/release/
+android/key.properties
+*.jks
+*.keystore
+/android/key/
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+*.xcworkspace
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db

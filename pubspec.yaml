@@ -1,0 +1,117 @@
+name: sakura_beauty
+description: Sakura Beauty - Japanese Skincare E-Commerce Android App
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+  flutter: '>=3.16.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # UI
+  cupertino_icons: ^1.0.6
+  google_fonts: ^6.1.0
+  cached_network_image: ^3.3.1
+  shimmer: ^3.0.0
+  flutter_rating_bar: ^4.0.1
+  carousel_slider: ^4.2.1
+  flutter_svg: ^2.0.10
+  lottie: ^3.1.0
+  animations: ^2.0.11
+  flutter_staggered_animations: ^1.1.1
+  flutter_slidable: ^3.1.0
+  pull_to_refresh: ^2.0.0
+
+  # State Management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # Navigation
+  go_router: ^14.2.0
+
+  # Networking
+  dio: ^5.4.3+1
+  retrofit: ^4.1.0
+  json_annotation: ^4.9.0
+  connectivity_plus: ^6.0.3
+
+  # Auth (Clerk)
+  clerk_flutter: ^1.2.1
+
+  # Storage
+  shared_preferences: ^2.2.3
+  flutter_secure_storage: ^9.2.2
+
+  # Utils
+  intl: ^0.19.0
+  url_launcher: ^6.2.6
+  image_picker: ^1.1.2
+  flutter_image_compress: ^2.3.0
+  package_info_plus: ^8.0.0
+  device_info_plus: ^10.1.0
+  flutter_native_splash: ^2.4.0
+  flutter_launcher_icons: ^0.13.1
+  logger: ^2.3.0
+  equatable: ^2.0.5
+  freezed_annotation: ^2.4.1
+  uuid: ^4.4.0
+  path_provider: ^2.1.3
+
+  # Payment
+  flutter_stripe: ^10.1.1
+
+  # Push Notifications
+  firebase_core: ^2.27.1
+  firebase_messaging: ^14.7.20
+  flutter_local_notifications: ^17.1.2
+
+  # Analytics
+  firebase_analytics: ^10.10.7
+
+  # Deep Linking
+  app_links: ^6.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.2
+  build_runner: ^2.4.9
+  retrofit_generator: ^8.1.0
+  json_serializable: ^6.8.0
+  freezed: ^2.5.2
+  riverpod_generator: ^2.4.0
+  mockito: ^5.4.4
+  mocktail: ^1.0.3
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/fonts/
+
+  fonts:
+    - family: NotoSansJP
+      fonts:
+        - asset: assets/fonts/NotoSansJP-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/NotoSansJP-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/NotoSansJP-Bold.ttf
+          weight: 700
+
+flutter_native_splash:
+  color: "#FFF5F5"
+  image: assets/images/splash_logo.png
+  android: true
+
+flutter_launcher_icons:
+  android: true
+  image_path: assets/images/app_icon.png
+  adaptive_icon_background: "#FFF5F5"
+  adaptive_icon_foreground: assets/images/app_icon_foreground.png
