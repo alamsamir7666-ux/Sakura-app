@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:clerk_flutter/clerk_flutter.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/providers/auth_provider.dart';
-import '../../core/models/user.dart';
-import '../../core/api/user_service.dart';
 import '../../shared/widgets/common_widgets.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -12,29 +10,24 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isSignedIn = ref.watch(isSignedInProvider);
-    final userAsync = ref.watch(currentUserProvider);
-
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
-      body: isSignedIn
-          ? userAsync.when(
-              data: (user) => _buildProfile(context, ref, user),
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
-              error: (_, __) =>
-                  const EmptyState(icon: Icons.error, title: 'Error', subtitle: ''),
-            )
-          : _buildSignInPrompt(context),
+      body: ClerkAuthBuilder(
+        signedInBuilder: (context, authState) => _buildProfile(context, ref, authState),
+        signedOutBuilder: (context, authState) => _buildSignInPrompt(context),
+      ),
     );
   }
 
-  Widget _buildProfile(
-      BuildContext context, WidgetRef ref, Map<String, dynamic>? user) {
+  Widget _buildProfile(BuildContext context, WidgetRef ref, ClerkAuthState authState) {
+    final user = authState.user;
+    final email = authState.userEmailAddresses.isNotEmpty
+        ? authState.userEmailAddresses.first.emailAddress
+        : '';
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        // User info card
         Card(
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -43,12 +36,15 @@ class ProfileScreen extends ConsumerWidget {
                 CircleAvatar(
                   radius: 32,
                   backgroundColor: AppTheme.primaryPink.withOpacity(0.1),
-                  backgroundImage: user?['imageUrl'] != null
-                      ? NetworkImage(user!['imageUrl'] as String)
+                  backgroundImage: authState.userImageUrl != null
+                      ? NetworkImage(authState.userImageUrl!)
                       : null,
-                  child: user?['imageUrl'] == null
+                  child: authState.userImageUrl == null
                       ? Text(
-                          (user?['firstName']?[0] ?? 'U').toUpperCase(),
+                          (authState.userFullName?.isNotEmpty == true
+                                  ? authState.userFullName![0]
+                                  : 'U')
+                              .toUpperCase(),
                           style: const TextStyle(
                               color: AppTheme.primaryPink,
                               fontWeight: FontWeight.bold,
@@ -62,73 +58,46 @@ class ProfileScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${user?['firstName'] ?? ''} ${user?['lastName'] ?? ''}',
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                        authState.userFullName ?? 'User',
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
-                      Text(user?['email'] ?? '',
-                          style: const TextStyle(
-                              color: AppTheme.warmGray, fontSize: 13)),
+                      Text(email,
+                          style: const TextStyle(color: AppTheme.warmGray, fontSize: 13)),
                     ],
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit, color: AppTheme.primaryPink),
-                  onPressed: () {},
                 ),
               ],
             ),
           ),
         ),
         const SizedBox(height: 24),
-        // Menu items
         _buildMenuSection('Account', [
-          _MenuItem(Icons.shopping_bag, 'My Orders',
-              () => context.push('/orders')),
-          _MenuItem(Icons.favorite, 'Wishlist',
-              () => context.push('/wishlist')),
-          _MenuItem(Icons.location_on, 'Addresses',
-              () => context.push('/addresses')),
-          _MenuItem(Icons.local_shipping, 'Track Order',
-              () => context.push('/track')),
+          _MenuItem(Icons.shopping_bag, 'My Orders', () => context.push('/orders')),
+          _MenuItem(Icons.favorite, 'Wishlist', () => context.push('/wishlist')),
+          _MenuItem(Icons.location_on, 'Addresses', () => context.push('/addresses')),
+          _MenuItem(Icons.local_shipping, 'Track Order', () => context.push('/track')),
         ]),
         _buildMenuSection('Rewards', [
-          _MenuItem(Icons.card_giftcard, 'Loyalty Points',
-              () => context.push('/loyalty')),
-          _MenuItem(Icons.share, 'Refer a Friend',
-              () => context.push('/referral')),
-          _MenuItem(Icons.card_giftcard_outlined, 'Gift Cards',
-              () => context.push('/gift-cards')),
+          _MenuItem(Icons.card_giftcard, 'Loyalty Points', () => context.push('/loyalty')),
+          _MenuItem(Icons.share, 'Refer a Friend', () => context.push('/referral')),
+          _MenuItem(Icons.card_giftcard_outlined, 'Gift Cards', () => context.push('/gift-cards')),
         ]),
         _buildMenuSection('More', [
-          _MenuItem(Icons.face, 'Skin Profile',
-              () => context.push('/skin-profile')),
-          _MenuItem(Icons.subscriptions, 'Subscriptions',
-              () => context.push('/subscriptions')),
-          _MenuItem(Icons.keyboard_return, 'Returns & Refunds',
-              () => context.push('/returns')),
-          _MenuItem(Icons.article, 'Blog',
-              () => context.push('/blog')),
-          _MenuItem(Icons.email, 'Email Preferences',
-              () => context.push('/email-preferences')),
-          _MenuItem(Icons.mail, 'Newsletter',
-              () => context.push('/newsletter')),
-          _MenuItem(Icons.compare_arrows, 'Compare Products',
-              () => context.push('/compare')),
-          _MenuItem(Icons.card_giftcard_outlined, 'Gift Cards',
-              () => context.push('/gift-cards')),
-          _MenuItem(Icons.settings, 'Settings',
-              () => context.push('/settings')),
+          _MenuItem(Icons.face, 'Skin Profile', () => context.push('/skin-profile')),
+          _MenuItem(Icons.subscriptions, 'Subscriptions', () => context.push('/subscriptions')),
+          _MenuItem(Icons.keyboard_return, 'Returns & Refunds', () => context.push('/returns')),
+          _MenuItem(Icons.article, 'Blog', () => context.push('/blog')),
+          _MenuItem(Icons.email, 'Email Preferences', () => context.push('/email-preferences')),
+          _MenuItem(Icons.mail, 'Newsletter', () => context.push('/newsletter')),
+          _MenuItem(Icons.compare_arrows, 'Compare Products', () => context.push('/compare')),
+          _MenuItem(Icons.settings, 'Settings', () => context.push('/settings')),
         ]),
         const SizedBox(height: 16),
         SizedBox(
           width: double.infinity,
           child: OutlinedButton(
-            onPressed: () async {
-              await ref.read(authProvider).signOut();
-              ref.invalidate(currentUserProvider);
-            },
+            onPressed: () => authState.signOut(),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppTheme.errorRed,
               side: const BorderSide(color: AppTheme.errorRed),
@@ -159,10 +128,7 @@ class ProfileScreen extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 8),
           child: Text(title,
-              style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.primaryPink)),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.primaryPink)),
         ),
         Card(
           margin: const EdgeInsets.only(bottom: 16),
@@ -172,16 +138,12 @@ class ProfileScreen extends ConsumerWidget {
               return Column(
                 children: [
                   ListTile(
-                    leading:
-                        Icon(item.icon, color: AppTheme.charcoal, size: 22),
-                    title: Text(item.title,
-                        style: const TextStyle(fontSize: 14)),
-                    trailing: const Icon(Icons.arrow_forward_ios,
-                        size: 14, color: AppTheme.warmGray),
+                    leading: Icon(item.icon, color: AppTheme.charcoal, size: 22),
+                    title: Text(item.title, style: const TextStyle(fontSize: 14)),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.warmGray),
                     onTap: item.onTap,
                   ),
-                  if (!isLast)
-                    const Divider(height: 1, indent: 56),
+                  if (!isLast) const Divider(height: 1, indent: 56),
                 ],
               );
             }).toList(),
@@ -196,6 +158,5 @@ class _MenuItem {
   final IconData icon;
   final String title;
   final VoidCallback onTap;
-
   const _MenuItem(this.icon, this.title, this.onTap);
 }

@@ -4,14 +4,7 @@ import 'package:clerk_flutter/clerk_flutter.dart';
 import 'app.dart';
 import 'core/utils/logger.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize Clerk
-  await Clerk.initialize(
-    publishableKey: const String.fromEnvironment('CLERK_PUBLISHABLE_KEY'),
-  );
-
+void main() {
   AppLogger.init();
 
   runApp(

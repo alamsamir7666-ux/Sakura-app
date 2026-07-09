@@ -1,14 +1,20 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:clerk_flutter/clerk_flutter.dart';
 import '../utils/api_constants.dart';
 import '../utils/logger.dart';
 
+/// Holds the current Clerk session token for API authentication.
+class SessionTokenHolder {
+  static String? _token;
+  static void setToken(String? token) => _token = token;
+  static String? get token => _token;
+}
+
 class ApiClient {
   late final Dio _dio;
-  final Ref? _ref;
 
-  ApiClient({Ref? ref}) : _ref = ref {
+  ApiClient({Ref? ref}) {
     _dio = Dio(BaseOptions(
       baseUrl: ApiConstants.apiUrl,
       connectTimeout: ApiConstants.connectTimeout,
@@ -21,110 +27,34 @@ class ApiClient {
     ));
 
     _dio.interceptors.addAll([
-      _AuthInterceptor(_ref),
+      _AuthInterceptor(),
       _LoggingInterceptor(),
       _ErrorInterceptor(),
     ]);
   }
 
-  Future<Response<T>> get<T>(
-    String path, {
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) {
-    return _dio.get<T>(
-      path,
-      queryParameters: queryParameters,
-      options: options,
-      cancelToken: cancelToken,
-    );
-  }
+  Future<Response<T>> get<T>(String path, {Map<String, dynamic>? queryParameters, Options? options, CancelToken? cancelToken}) =>
+      _dio.get<T>(path, queryParameters: queryParameters, options: options, cancelToken: cancelToken);
 
-  Future<Response<T>> post<T>(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) {
-    return _dio.post<T>(
-      path,
-      data: data,
-      queryParameters: queryParameters,
-      options: options,
-      cancelToken: cancelToken,
-    );
-  }
+  Future<Response<T>> post<T>(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options, CancelToken? cancelToken}) =>
+      _dio.post<T>(path, data: data, queryParameters: queryParameters, options: options, cancelToken: cancelToken);
 
-  Future<Response<T>> put<T>(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) {
-    return _dio.put<T>(
-      path,
-      data: data,
-      queryParameters: queryParameters,
-      options: options,
-      cancelToken: cancelToken,
-    );
-  }
+  Future<Response<T>> put<T>(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options, CancelToken? cancelToken}) =>
+      _dio.put<T>(path, data: data, queryParameters: queryParameters, options: options, cancelToken: cancelToken);
 
-  Future<Response<T>> delete<T>(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) {
-    return _dio.delete<T>(
-      path,
-      data: data,
-      queryParameters: queryParameters,
-      options: options,
-      cancelToken: cancelToken,
-    );
-  }
+  Future<Response<T>> delete<T>(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options, CancelToken? cancelToken}) =>
+      _dio.delete<T>(path, data: data, queryParameters: queryParameters, options: options, cancelToken: cancelToken);
 
-  Future<Response<T>> patch<T>(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) {
-    return _dio.patch<T>(
-      path,
-      data: data,
-      queryParameters: queryParameters,
-      options: options,
-      cancelToken: cancelToken,
-    );
-  }
+  Future<Response<T>> patch<T>(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options, CancelToken? cancelToken}) =>
+      _dio.patch<T>(path, data: data, queryParameters: queryParameters, options: options, cancelToken: cancelToken);
 }
 
 class _AuthInterceptor extends Interceptor {
-  final Ref? _ref;
-
-  _AuthInterceptor(this._ref);
-
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
-    try {
-      if (_ref != null) {
-        final session = Clerk.session;
-        if (session != null) {
-          final token = await session.getToken();
-          if (token != null) {
-            options.headers['Authorization'] = 'Bearer $token';
-          }
-        }
-      }
-    } catch (e) {
-      AppLogger.w('Failed to get auth token: $e');
+    final token = SessionTokenHolder.token;
+    if (token != null && token.isNotEmpty) {
+      options.headers['Authorization'] = 'Bearer $token';
     }
     handler.next(options);
   }
@@ -134,9 +64,6 @@ class _LoggingInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     AppLogger.d('🌐 ${options.method} ${options.uri}');
-    if (options.data != null) {
-      AppLogger.d('Body: ${options.data}');
-    }
     handler.next(options);
   }
 
@@ -167,18 +94,14 @@ class _ErrorInterceptor extends Interceptor {
       500 => 'Server error. Please try again later.',
       _ => err.message ?? 'An unexpected error occurred.',
     };
-    handler.next(
-      DioException(
-        requestOptions: err.requestOptions,
-        response: err.response,
-        error: message,
-        type: err.type,
-        message: message,
-      ),
-    );
+    handler.next(DioException(
+      requestOptions: err.requestOptions,
+      response: err.response,
+      error: message,
+      type: err.type,
+      message: message,
+    ));
   }
 }
 
-final apiClientProvider = Provider<ApiClient>((ref) {
-  return ApiClient(ref: ref);
-});
+final apiClientProvider = Provider<ApiClient>((ref) => ApiClient(ref: ref));

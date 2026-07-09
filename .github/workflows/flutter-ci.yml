@@ -16,7 +16,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.0'
+          flutter-version: '3.27.4'
           channel: 'stable'
           cache: true
 
@@ -38,7 +38,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.0'
+          flutter-version: '3.27.4'
           channel: 'stable'
           cache: true
 
@@ -51,8 +51,8 @@ jobs:
           API_URL: ${{ secrets.API_BASE_URL || 'https://envy-enhance-fixed5.vercel.app' }}
         run: |
           flutter build apk --debug \
-            --dart-define=CLERK_PUBLISHABLE_KEY=$CLERK_KEY \
-            --dart-define=API_BASE_URL=$API_URL
+            --dart-define=CLERK_PUBLISHABLE_KEY="$CLERK_KEY" \
+            --dart-define=API_BASE_URL="$API_URL"
 
       - name: Build APK (release)
         env:
@@ -60,8 +60,8 @@ jobs:
           API_URL: ${{ secrets.API_BASE_URL || 'https://envy-enhance-fixed5.vercel.app' }}
         run: |
           flutter build apk --release \
-            --dart-define=CLERK_PUBLISHABLE_KEY=$CLERK_KEY \
-            --dart-define=API_BASE_URL=$API_URL \
+            --dart-define=CLERK_PUBLISHABLE_KEY="$CLERK_KEY" \
+            --dart-define=API_BASE_URL="$API_URL" \
             --dart-define=FLAVOR=production
 
       - name: Upload debug APK

@@ -1,22 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clerk_flutter/clerk_flutter.dart';
 import '../api/api_client.dart';
+import '../config/app_config.dart';
 
-final isSignedInProvider = Provider<bool>((ref) {
-  return Clerk.session != null;
+final clerkPublishableKeyProvider = Provider<String>((ref) {
+  final config = AppConfig.fromEnvironment();
+  return config.clerkPublishableKey;
 });
 
-final currentUserProvider = FutureProvider<Map<String, dynamic>?>((ref) async {
-  final session = Clerk.session;
-  if (session == null) return null;
-  final user = session.user;
-  return {
-    'id': user.id,
-    'email': user.emailAddresses.firstOrNull?.emailAddress,
-    'firstName': user.firstName,
-    'lastName': user.lastName,
-    'imageUrl': user.imageUrl,
-  };
+final authStateProvider = Provider<ClerkAuthState?>((ref) {
+  // Access via ClerkAuthStateScope in widget tree
+  throw UnimplementedError('Use ClerkAuthBuilder or ClerkAuthStateScope to access auth state');
 });
 
 final authProvider = Provider<AuthService>((ref) {
@@ -34,9 +28,5 @@ class AuthService {
     } catch (_) {
       return false;
     }
-  }
-
-  Future<void> signOut() async {
-    await Clerk.signOut();
   }
 }

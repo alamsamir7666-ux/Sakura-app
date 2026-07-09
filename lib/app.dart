@@ -15,26 +15,28 @@ class SakuraBeautyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
     final themeMode = ref.watch(themeModeProvider);
+    final publishableKey = ref.watch(clerkPublishableKeyProvider);
 
     return AppErrorBoundary(
-      child: ClerkProvider(
+      child: ClerkAuth(
+        config: ClerkAuthConfig(publishableKey: publishableKey),
         child: MaterialApp.router(
-        title: 'Sakura Beauty',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: themeMode,
-        routerConfig: router,
-        locale: const Locale('en'),
-        supportedLocales: const [
-          Locale('en'),
-          Locale('ja'),
-        ],
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
+          title: 'Sakura Beauty',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeMode,
+          routerConfig: router,
+          locale: const Locale('en'),
+          supportedLocales: const [
+            Locale('en'),
+            Locale('ja'),
+          ],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
         ),
       ),
     );
