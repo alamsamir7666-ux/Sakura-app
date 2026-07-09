@@ -487,7 +487,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                   Chip(label: Text(b, style: const TextStyle(fontSize: 11)),
                       backgroundColor: AppTheme.softGreen.withOpacity(0.15),
                       padding: EdgeInsets.zero,
-                      visualDensity: VisualDensity.compact)).toList(),
+                      visualDensity: VisualDensity.compact)).toList()),
           ],
           // Texture
           if (product.texture != null && product.texture!.isNotEmpty) ...[

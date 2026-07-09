@@ -33,7 +33,6 @@ class ProductFilters {
   final double? minPrice;
   final double? maxPrice;
   final double? minRating;
-  double? minRating;
   final String? sortBy;
   final int page;
 

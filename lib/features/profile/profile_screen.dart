@@ -23,7 +23,7 @@ class ProfileScreen extends ConsumerWidget {
     final user = authState.user;
     final emailAddresses = user?.emailAddresses ?? [];
     final primaryEmail = emailAddresses.isNotEmpty ? emailAddresses.first.emailAddress : '';
-    final fullName = user?.fullName ?? user?.username ?? 'User';
+    final fullName = user?.username ?? user?.firstName ?? 'User';
 
     return ListView(
       padding: const EdgeInsets.all(16),

@@ -1,23 +1,5 @@
 import 'product.dart';
-
-class AddressBody {
-  final String fullName;
-  final String phone;
-  final String street;
-  final String city;
-  final String district;
-  final String? postalCode;
-
-  const AddressBody({required this.fullName, required this.phone, required this.street, required this.city, required this.district, this.postalCode});
-
-  factory AddressBody.fromJson(Map<String, dynamic> json) => AddressBody(
-    fullName: json['fullName'] as String, phone: json['phone'] as String,
-    street: json['street'] as String, city: json['city'] as String,
-    district: json['district'] as String, postalCode: json['postalCode'] as String?,
-  );
-
-  String get fullAddress => '$street, $city, $district';
-}
+import 'address.dart';
 
 class OrderItem {
   final int id;
@@ -70,5 +52,35 @@ class Order {
     couponCode: json['couponCode'] as String?, discountAmount: (json['discountAmount'] as num).toDouble(),
     cancellationReason: json['cancellationReason'] as String?,
     createdAt: json['createdAt'] as String, updatedAt: json['updatedAt'] as String,
+  );
+}
+
+class OrderTracking {
+  final String trackingId;
+  final String status;
+  final String estimatedDelivery;
+  final String? courierName;
+  final List<OrderTrackingStep> steps;
+
+  const OrderTracking({required this.trackingId, required this.status, required this.estimatedDelivery, this.courierName, required this.steps});
+
+  factory OrderTracking.fromJson(Map<String, dynamic> json) => OrderTracking(
+    trackingId: json['trackingId'] as String, status: json['status'] as String,
+    estimatedDelivery: json['estimatedDelivery'] as String, courierName: json['courierName'] as String?,
+    steps: (json['steps'] as List<dynamic>).map((e) => OrderTrackingStep.fromJson(e as Map<String, dynamic>)).toList(),
+  );
+}
+
+class OrderTrackingStep {
+  final String title;
+  final String description;
+  final String timestamp;
+  final bool isCompleted;
+
+  const OrderTrackingStep({required this.title, required this.description, required this.timestamp, required this.isCompleted});
+
+  factory OrderTrackingStep.fromJson(Map<String, dynamic> json) => OrderTrackingStep(
+    title: json['title'] as String, description: json['description'] as String,
+    timestamp: json['timestamp'] as String, isCompleted: json['isCompleted'] as bool,
   );
 }

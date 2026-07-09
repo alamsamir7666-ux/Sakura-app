@@ -429,7 +429,7 @@ class _AdminScreenState extends ConsumerState<AdminScreen>
                         await ref.read(productServiceProvider).deleteProduct(p['id'] as int);
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('${p.name} deleted'), backgroundColor: AppTheme.successGreen),
+                            SnackBar(content: Text('${p['name']} deleted'), backgroundColor: AppTheme.successGreen),
                           );
                           setState(() {});
                         }
