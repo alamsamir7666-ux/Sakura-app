@@ -228,12 +228,5 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       }
       return null;
     },
-    routes: [
-      GoRoute(
-        path: '/not-found',
-        name: 'notFound',
-        builder: (context, state) => const NotFoundScreen(),
-      ),
-    ],
   );
 });

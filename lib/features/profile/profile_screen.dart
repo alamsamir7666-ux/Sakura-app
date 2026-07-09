@@ -21,9 +21,9 @@ class ProfileScreen extends ConsumerWidget {
 
   Widget _buildProfile(BuildContext context, WidgetRef ref, ClerkAuthState authState) {
     final user = authState.user;
-    final email = authState.userEmailAddresses.isNotEmpty
-        ? authState.userEmailAddresses.first.emailAddress
-        : '';
+    final emailAddresses = user?.emailAddresses ?? [];
+    final primaryEmail = emailAddresses.isNotEmpty ? emailAddresses.first.emailAddress : '';
+    final fullName = user?.fullName ?? user?.username ?? 'User';
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -36,20 +36,10 @@ class ProfileScreen extends ConsumerWidget {
                 CircleAvatar(
                   radius: 32,
                   backgroundColor: AppTheme.primaryPink.withOpacity(0.1),
-                  backgroundImage: authState.userImageUrl != null
-                      ? NetworkImage(authState.userImageUrl!)
-                      : null,
-                  child: authState.userImageUrl == null
-                      ? Text(
-                          (authState.userFullName?.isNotEmpty == true
-                                  ? authState.userFullName![0]
-                                  : 'U')
-                              .toUpperCase(),
-                          style: const TextStyle(
-                              color: AppTheme.primaryPink,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 22),
-                        )
+                  backgroundImage: user?.imageUrl != null ? NetworkImage(user!.imageUrl!) : null,
+                  child: user?.imageUrl == null
+                      ? Text((fullName.isNotEmpty ? fullName[0] : 'U').toUpperCase(),
+                          style: const TextStyle(color: AppTheme.primaryPink, fontWeight: FontWeight.bold, fontSize: 22))
                       : null,
                 ),
                 const SizedBox(width: 16),
@@ -57,16 +47,13 @@ class ProfileScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        authState.userFullName ?? 'User',
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
+                      Text(fullName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 4),
-                      Text(email,
-                          style: const TextStyle(color: AppTheme.warmGray, fontSize: 13)),
+                      Text(primaryEmail, style: const TextStyle(color: AppTheme.warmGray, fontSize: 13)),
                     ],
                   ),
                 ),
+                const ClerkUserButton(),
               ],
             ),
           ),
@@ -76,22 +63,11 @@ class ProfileScreen extends ConsumerWidget {
           _MenuItem(Icons.shopping_bag, 'My Orders', () => context.push('/orders')),
           _MenuItem(Icons.favorite, 'Wishlist', () => context.push('/wishlist')),
           _MenuItem(Icons.location_on, 'Addresses', () => context.push('/addresses')),
-          _MenuItem(Icons.local_shipping, 'Track Order', () => context.push('/track')),
-        ]),
-        _buildMenuSection('Rewards', [
-          _MenuItem(Icons.card_giftcard, 'Loyalty Points', () => context.push('/loyalty')),
-          _MenuItem(Icons.share, 'Refer a Friend', () => context.push('/referral')),
-          _MenuItem(Icons.card_giftcard_outlined, 'Gift Cards', () => context.push('/gift-cards')),
         ]),
         _buildMenuSection('More', [
-          _MenuItem(Icons.face, 'Skin Profile', () => context.push('/skin-profile')),
-          _MenuItem(Icons.subscriptions, 'Subscriptions', () => context.push('/subscriptions')),
-          _MenuItem(Icons.keyboard_return, 'Returns & Refunds', () => context.push('/returns')),
-          _MenuItem(Icons.article, 'Blog', () => context.push('/blog')),
-          _MenuItem(Icons.email, 'Email Preferences', () => context.push('/email-preferences')),
-          _MenuItem(Icons.mail, 'Newsletter', () => context.push('/newsletter')),
-          _MenuItem(Icons.compare_arrows, 'Compare Products', () => context.push('/compare')),
           _MenuItem(Icons.settings, 'Settings', () => context.push('/settings')),
+          _MenuItem(Icons.face, 'Skin Profile', () => context.push('/skin-profile')),
+          _MenuItem(Icons.article, 'Blog', () => context.push('/blog')),
         ]),
         const SizedBox(height: 16),
         SizedBox(
@@ -127,25 +103,22 @@ class ProfileScreen extends ConsumerWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Text(title,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.primaryPink)),
+          child: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.primaryPink)),
         ),
         Card(
           margin: const EdgeInsets.only(bottom: 16),
           child: Column(
             children: items.map((item) {
               final isLast = items.last == item;
-              return Column(
-                children: [
-                  ListTile(
-                    leading: Icon(item.icon, color: AppTheme.charcoal, size: 22),
-                    title: Text(item.title, style: const TextStyle(fontSize: 14)),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.warmGray),
-                    onTap: item.onTap,
-                  ),
-                  if (!isLast) const Divider(height: 1, indent: 56),
-                ],
-              );
+              return Column(children: [
+                ListTile(
+                  leading: Icon(item.icon, color: AppTheme.charcoal, size: 22),
+                  title: Text(item.title, style: const TextStyle(fontSize: 14)),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.warmGray),
+                  onTap: item.onTap,
+                ),
+                if (!isLast) const Divider(height: 1, indent: 56),
+              ]);
             }).toList(),
           ),
         ),

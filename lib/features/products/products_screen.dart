@@ -6,6 +6,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/models/product.dart';
 import '../../core/models/category.dart';
 import '../../core/api/product_service.dart';
+import '../../core/api/cart_service.dart';
 import '../../core/providers/app_providers.dart';
 import '../../shared/widgets/product_card.dart';
 import '../../shared/widgets/skeletons.dart';
@@ -32,6 +33,7 @@ class ProductFilters {
   final double? minPrice;
   final double? maxPrice;
   final double? minRating;
+  double? minRating;
   final String? sortBy;
   final int page;
 

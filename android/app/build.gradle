@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace = "com.sakurabeauty.app"
-    compileSdk = 34
+    compileSdk = 35
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -42,7 +42,7 @@ android {
     defaultConfig {
         applicationId = "com.sakurabeauty.app"
         minSdk = 23
-        targetSdk = 34
+        targetSdk = 35
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
         multiDexEnabled = true

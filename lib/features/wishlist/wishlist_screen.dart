@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/api/extra_services.dart';
+import '../../core/providers/app_providers.dart';
 import '../../core/utils/api_constants.dart';
 import '../../shared/widgets/common_widgets.dart';
 

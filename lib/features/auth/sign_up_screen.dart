@@ -32,9 +32,7 @@ class SignUpScreen extends StatelessWidget {
               const SizedBox(height: 48),
               SizedBox(
                 width: double.infinity,
-                child: const ClerkAuthentication(
-                  initiallyVisible: 'sign_up',
-                ),
+                child: const ClerkAuthentication(),
               ),
               const Spacer(),
             ],

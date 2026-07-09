@@ -54,6 +54,15 @@ class ProductService {
     return HomepageProducts.fromJson(response.data as Map<String, dynamic>);
   }
 
+  Future<List<Map<String, dynamic>>> getProductsRaw({int limit = 50}) async {
+    final response = await _client.get('/products', queryParameters: {'limit': limit});
+    final data = response.data;
+    if (data is Map && data.containsKey('products')) {
+      return List<Map<String, dynamic>>.from(data['products'] as List);
+    }
+    return List<Map<String, dynamic>>.from(data as List);
+  }
+
   Future<Product> createProduct(Map<String, dynamic> data) async {
     final response = await _client.post('/products', data: data);
     return Product.fromJson(response.data as Map<String, dynamic>);

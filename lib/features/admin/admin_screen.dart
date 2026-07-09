@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/api/extra_services.dart';
+import '../../core/api/product_service.dart';
 import '../../core/models/dashboard.dart' as dm;
 
 final dashboardProvider = FutureProvider<dm.DashboardStats>((ref) {
@@ -395,8 +396,8 @@ class _AdminScreenState extends ConsumerState<AdminScreen>
   }
 
   Widget _buildProductsTab() {
-    return FutureBuilder(
-      future: ref.read(productServiceProvider).getProducts(limit: 50),
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: ref.read(productServiceProvider).getProductsRaw(limit: 50),
       builder: (ctx, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -404,28 +405,28 @@ class _AdminScreenState extends ConsumerState<AdminScreen>
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
-        final response = snapshot.data;
-        if (response == null || response.products.isEmpty) {
+        final products = snapshot.data ?? [];
+        if (products.isEmpty) {
           return const Center(child: Text('No products', style: TextStyle(color: AppTheme.warmGray)));
         }
         return ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: response.products.length,
+          itemCount: products.length,
           itemBuilder: (_, i) {
-            final p = response.products[i];
+            final p = products[i];
             return Card(
               margin: const EdgeInsets.only(bottom: 8),
               child: ListTile(
                 leading: CircleAvatar(backgroundColor: AppTheme.secondaryPink.withOpacity(0.2)),
-                title: Text(p.name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                title: Text(p['name'] as String, maxLines: 1, overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                subtitle: Text('${p.category} • Stock: ${p.stock} • \$${p.price}',
+                subtitle: Text('${p['category']} • Stock: ${p['stock']} • \$${p['price']}',
                     style: const TextStyle(fontSize: 11, color: AppTheme.warmGray)),
                 trailing: PopupMenuButton<String>(
                   onSelected: (action) async {
                     if (action == 'delete') {
                       try {
-                        await ref.read(productServiceProvider).deleteProduct(p.id);
+                        await ref.read(productServiceProvider).deleteProduct(p['id'] as int);
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('${p.name} deleted'), backgroundColor: AppTheme.successGreen),

@@ -12,6 +12,7 @@ import '../../core/models/product_extra.dart';
 import '../../core/api/product_service.dart';
 import '../../core/api/extra_services.dart';
 import '../../core/api/remaining_services.dart';
+import '../../core/api/cart_service.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/utils/api_constants.dart';
 import '../../shared/widgets/skeletons.dart';
@@ -26,17 +27,34 @@ final productReviewsProvider = FutureProvider.family<List<Review>, int>((ref, pr
   return ref.watch(reviewServiceProvider).getReviews(productId);
 });
 
-final productVariantsProvider = FutureProvider.family<List<ProductVariant>, int>((ref, id) {
-  return ref.watch(variantServiceProvider).getVariants(id);
-});
+final productVariantsProvider = FutureProvider.family<List<Map<String, dynamic>>, int>((ref, id) { return ref.watch(variantServiceProvider).getVariants(id); });
 
-final productQAProvider = FutureProvider.family<List<ProductQA>, int>((ref, id) {
-  return ref.watch(qaServiceProvider).getQuestions(id);
-});
+final productQAProvider = FutureProvider.family<List<Map<String, dynamic>>, int>((ref, id) { return ref.watch(qaServiceProvider).getQuestions(id); });
 
 final reviewEligibilityProvider = FutureProvider.family<ReviewEligibility, int>((ref, id) {
   return ref.watch(reviewServiceProvider).getEligibility(id);
 });
+
+class _VariantData {
+  final Map<String, dynamic> d;
+  const _VariantData(this.d);
+  int get id => d['id'] as int;
+  bool get inStock => d['inStock'] == true;
+  String get name => d['name'] as String;
+  String? get color => d['color'] as String?;
+  String? get size => d['size'] as String?;
+  num? get priceModifier => d['priceModifier'] as num?;
+}
+
+class _QAData {
+  final Map<String, dynamic> d;
+  const _QAData(this.d);
+  String get question => d['question'] as String;
+  bool get isAnswered => d['isAnswered'] == true;
+  String? get answer => d['answer'] as String?;
+  String get userName => d['userName'] as String? ?? 'Anonymous';
+  String get createdAt => d['createdAt'] as String? ?? '';
+}
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   final int productId;
@@ -85,7 +103,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
       loading: () => const _ProductDetailSkeleton(),
       error: (e, _) => Scaffold(
         appBar: AppBar(),
-        body: ErrorView(message: e.toString(), onRetry: () => ref.invalidate(productDetailProvider(widget.productId))),
+        body: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Text('Error', style: TextStyle(color: AppTheme.errorRed, fontSize: 16)), const SizedBox(height: 8), Text(e.toString(), style: const TextStyle(fontSize: 12, color: AppTheme.warmGray), textAlign: TextAlign.center), const SizedBox(height: 16), ElevatedButton(onPressed: () => ref.invalidate(productDetailProvider(widget.productId)), child: const Text('Retry'))])),
       ),
     );
   }
@@ -132,7 +150,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
         Consumer(
           builder: (context, ref, _) {
             final wishlist = ref.watch(wishlistProvider);
-            final isFav = wishlist.isInWishlist(product.id);
+            final isFav = wishlist.contains(product.id);
             return IconButton(
               icon: Icon(isFav ? Icons.favorite : Icons.favorite_border,
                   color: isFav ? AppTheme.errorRed : null),
@@ -325,7 +343,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8, runSpacing: 8,
-                children: variants.map((v) {
+                children: variants.map((v) => _VariantData(v)).map((v) {
                   final selected = _selectedVariantId == v.id;
                   return GestureDetector(
                     onTap: v.inStock ? () => setState(() => _selectedVariantId = selected ? null : v.id) : null,
@@ -469,7 +487,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                   Chip(label: Text(b, style: const TextStyle(fontSize: 11)),
                       backgroundColor: AppTheme.softGreen.withOpacity(0.15),
                       padding: EdgeInsets.zero,
-                      visualDensity: VisualDensity.compact))).toList(),
+                      visualDensity: VisualDensity.compact)).toList(),
           ],
           // Texture
           if (product.texture != null && product.texture!.isNotEmpty) ...[
@@ -544,7 +562,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
               ),
             ),
             // Write review button
-            eligibilityAsync.whenOrNull(
+            eligibilityAsync.when(
               data: (elig) => elig.canReview
                   ? Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -558,7 +576,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                         ),
                       ),
                     )
-                  : null,
+                  : const SizedBox.shrink(),
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
             ),
             const Divider(),
             // Review list
@@ -618,7 +638,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
               );
             }
             return Column(
-              children: questions.map((qa) => Padding(
+              children: questions.map((q) => _QAData(q)).map((qa) => Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

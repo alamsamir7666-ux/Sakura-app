@@ -8,6 +8,7 @@ import '../../core/api/cart_service.dart';
 import '../../core/api/order_service.dart';
 import '../../core/api/user_service.dart';
 import '../../core/providers/app_providers.dart';
+import '../../shared/widgets/common_widgets.dart';
 
 final addressesListProvider = FutureProvider<List<Address>>((ref) {
   return ref.watch(userServiceProvider).getAddresses();
