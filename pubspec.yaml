@@ -68,14 +68,6 @@ dependencies:
   # Payment
   flutter_stripe: ^10.1.1
 
-  # Push Notifications
-  firebase_core: ^2.27.1
-  firebase_messaging: ^14.7.20
-  flutter_local_notifications: ^17.1.2
-
-  # Analytics
-  firebase_analytics: ^10.10.7
-
   # Deep Linking
   app_links: ^6.0.2
 
