@@ -36,7 +36,7 @@ class ProductFilters {
   final String? sortBy;
   final int page;
 
-  const ProductFilters({
+  ProductFilters({
     this.category, this.search, this.minPrice, this.maxPrice,
     this.minRating, this.sortBy, this.page = 1,
   });

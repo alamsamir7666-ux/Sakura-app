@@ -62,25 +62,29 @@ class OrderTracking {
   final String? courierName;
   final List<OrderTrackingStep> timeline;
 
-  const OrderTracking({required this.trackingId, required this.status, required this.estimatedDelivery, this.courierName, required this.steps});
+  const OrderTracking({required this.trackingId, required this.orderStatus, required this.estimatedDelivery, this.courierName, required this.timeline});
 
   factory OrderTracking.fromJson(Map<String, dynamic> json) => OrderTracking(
-    trackingId: json['trackingId'] as String, orderStatus: json['status'] as String,
-    estimatedDelivery: json['estimatedDelivery'] as String, courierName: json['courierName'] as String?,
-    timeline: (json['steps'] as List<dynamic>).map((e) => OrderTrackingStep.fromJson(e as Map<String, dynamic>)).toList(),
+    trackingId: json['trackingId'] as String,
+    orderStatus: json['status'] as String? ?? 'processing',
+    estimatedDelivery: json['estimatedDelivery'] as String? ?? '',
+    courierName: json['courierName'] as String?,
+    timeline: (json['steps'] as List<dynamic>?)?.map((e) => OrderTrackingStep.fromJson(e as Map<String, dynamic>)).toList() ?? [],
   );
 }
 
 class OrderTrackingStep {
-  final String title;
+  final String label;
   final String description;
   final String timestamp;
-  final bool isCompleted;
+  final bool completed;
 
-  const OrderTrackingStep({required this.title, required this.description, required this.timestamp, required this.isCompleted});
+  const OrderTrackingStep({required this.label, required this.description, required this.timestamp, required this.completed});
 
   factory OrderTrackingStep.fromJson(Map<String, dynamic> json) => OrderTrackingStep(
-    title: json['title'] as String, description: json['description'] as String,
-    timestamp: json['timestamp'] as String, isCompleted: json['isCompleted'] as bool,
+    label: json['title'] as String? ?? json['label'] as String? ?? '',
+    description: json['description'] as String? ?? '',
+    timestamp: json['timestamp'] as String? ?? '',
+    completed: json['isCompleted'] as bool? ?? json['completed'] as bool? ?? false,
   );
 }
