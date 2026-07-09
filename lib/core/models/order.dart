@@ -57,17 +57,17 @@ class Order {
 
 class OrderTracking {
   final String trackingId;
-  final String status;
+  final String orderStatus;
   final String estimatedDelivery;
   final String? courierName;
-  final List<OrderTrackingStep> steps;
+  final List<OrderTrackingStep> timeline;
 
   const OrderTracking({required this.trackingId, required this.status, required this.estimatedDelivery, this.courierName, required this.steps});
 
   factory OrderTracking.fromJson(Map<String, dynamic> json) => OrderTracking(
-    trackingId: json['trackingId'] as String, status: json['status'] as String,
+    trackingId: json['trackingId'] as String, orderStatus: json['status'] as String,
     estimatedDelivery: json['estimatedDelivery'] as String, courierName: json['courierName'] as String?,
-    steps: (json['steps'] as List<dynamic>).map((e) => OrderTrackingStep.fromJson(e as Map<String, dynamic>)).toList(),
+    timeline: (json['steps'] as List<dynamic>).map((e) => OrderTrackingStep.fromJson(e as Map<String, dynamic>)).toList(),
   );
 }
 
